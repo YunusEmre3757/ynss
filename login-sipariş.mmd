@@ -1,0 +1,42 @@
+sequenceDiagram
+  participant User
+  participant LoginComponent
+  participant AuthService
+  participant HttpClient
+  participant API as Backend API
+  participant Router
+  participant CartService
+  participant CheckoutComponent
+  participant Stripe as StripeSDK
+  
+  User->>LoginComponent: Form submit (email, pwd)
+  LoginComponent->>AuthService: login()
+  AuthService->>HttpClient: POST /api/auth/login
+  HttpClient->>API: /auth/login
+  API-->>HttpClient: JWT + RefreshTok
+  HttpClient-->>AuthService: token
+  AuthService-->>LoginComponent: success
+  LoginComponent->>Router: navigate('/home')
+  
+  User->>ProductListComponent: "Add to Cart" click
+  ProductListComponent->>CartService: addItem(p)
+  
+  User->>CartComponent: open /cart
+  CartComponent->>CartService: cart$
+  CartService-->>CartComponent: CartState
+  
+  User->>CheckoutComponent: click Checkout
+  CheckoutComponent->>authGuard: canActivate?
+  authGuard->>AuthService: currentUser$
+  authGuard-->>Router: allow
+  
+  CheckoutComponent->>PaymentService: payWithStripe()
+  PaymentService->>Stripe: createPaymentIntent()
+  Stripe-->>PaymentService: PaymentSuccess
+  PaymentService->>OrderService: createOrder()
+  OrderService->>HttpClient: POST /api/orders
+  HttpClient->>API: /orders
+  API-->>HttpClient: OK
+  HttpClient-->>OrderService: resp
+  OrderService-->>CheckoutComponent: OrderID
+  CheckoutComponent->>Router: navigate('/order-success')

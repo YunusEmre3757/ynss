@@ -1,0 +1,28 @@
+flowchart TD
+  A[Seller Dashboard] --> B[Add Product Form]
+  B -->|save| C[ProductService.create()]
+  C -->|POST /api/products/create| API((Backend API))
+  API -->|201| D[Product Created]
+
+  A --> E[Edit Product]
+  E -->|update| F[ProductService.update()]
+  F -->|PUT /api/products/update| API
+  API -->|200| G[Product Updated]
+
+  A --> H[Delete Product]
+  H -->|confirm| I[ProductService.delete()]
+  I -->|DELETE /api/products/delete| API
+  API -->|204| J[Product Deleted]
+
+  subgraph UI
+    A
+    B
+    E
+    H
+  end
+
+  subgraph Service
+    C
+    F
+    I
+  end

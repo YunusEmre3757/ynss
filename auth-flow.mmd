@@ -1,0 +1,36 @@
+sequenceDiagram
+  autonumber
+  participant User
+  participant LoginComponent
+  participant AuthService
+  participant HttpClient
+  participant API as "Backend API"
+  participant AuthInterceptor
+  participant Router
+
+  User->>LoginComponent: Submit login form
+  LoginComponent->>AuthService: login(email, pwd)
+  AuthService->>HttpClient: POST /api/auth/login
+  HttpClient->>API: /auth/login
+  API-->>HttpClient: {accessToken, refreshToken}
+  HttpClient-->>AuthService: tokens
+  AuthService-->>LoginComponent: success
+  LoginComponent->>Router: navigate('/home')
+
+  Note over AuthInterceptor: All outgoing HTTP requests
+  LoginComponent->>HttpClient: GET /api/user/me
+  HttpClient->>AuthInterceptor: intercept()
+  AuthInterceptor->>AuthService: getAccessToken()
+  AuthInterceptor-->>HttpClient: inject Authorization: Bearer <JWT>
+  HttpClient->>API: /user/me
+  API-->>HttpClient: 401? (expired)
+  HttpClient-->>AuthInterceptor: 401 response
+  AuthInterceptor->>AuthService: refreshToken()
+  AuthService->>HttpClient: POST /api/auth/refresh-token
+  HttpClient->>API: /refresh-token
+  API-->>HttpClient: new JWT
+  HttpClient-->>AuthService: new JWT
+  AuthInterceptor-->>HttpClient: retry original request
+  HttpClient->>API: /user/me (with new JWT)
+  API-->>HttpClient: 200 OK
+  HttpClient-->>LoginComponent: user profile

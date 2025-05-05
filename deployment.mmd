@@ -1,0 +1,30 @@
+graph LR
+  subgraph CI/CD Pipeline
+    A[GitHub Actions] --> B[ng build --prod]
+    B --> C[Artifacts ZIP]
+    C --> D[Upload to Object Storage]\n(S3 / Azure Blob)
+    D --> E[Trigger Deployment]
+  end
+
+  subgraph Hosting
+    Nginx[NGINX (Static Files)]
+    Angular[Angular App\n(/dist)]
+    Nginx --> Angular
+  end
+
+  subgraph Backend Cluster
+    APIGateway[API Gateway / Ingress]
+    AuthServiceBE[(Auth Service)]
+    ProductServiceBE[(Product Service)]
+    OrderServiceBE[(Order Service)]
+    Storage[(PostgreSQL / S3)]
+    APIGateway --> AuthServiceBE
+    APIGateway --> ProductServiceBE
+    APIGateway --> OrderServiceBE
+    ProductServiceBE --> Storage
+    OrderServiceBE --> Storage
+    AuthServiceBE --> Storage
+  end
+
+  Internet((User Browser)) --> Nginx
+  Angular --REST--> APIGateway

@@ -1,0 +1,65 @@
+classDiagram
+  class AuthService {
+    +currentUser$
+    +login()
+    +register()
+    +refreshToken()
+    +getAccessToken()
+  }
+  class ProductService {
+    +list()
+    +details(id)
+    +search(q)
+    +create()
+    +update()
+    +delete()
+  }
+  class CartService {
+    +cart$
+    +addItem()
+    +removeItem()
+    +getCart()
+  }
+  class OrderService {
+    +createOrder()
+    +getOrders()
+    +getOrderDetail()
+  }
+  class StoreService {
+    +getStores()
+    +applyStore()
+    +getMyStores()
+  }
+  class AdminService {
+    +userSearch()
+    +banUser()
+    +stats()
+  }
+  class PaymentService {
+    +payWithStripe()
+  }
+  class FavoriteService
+  class BrandService
+  class CategoryService
+  class ReviewService
+  
+  %% Infrastructure
+  AuthInterceptor <|.. HttpClient   : intercept()
+  HttpClient --> BackendAPI
+  
+  %% Guards
+  authGuard --> AuthService
+  adminGuard --> AuthService
+  sellerGuard --> AuthService
+  
+  %% Component→Service Usage (sample)
+  HomeComponent --> ProductService
+  ProductListComponent --> ProductService
+  ProductDetailComponent --> ProductService
+  CartComponent --> CartService
+  CheckoutComponent --> CartService
+  CheckoutComponent --> PaymentService
+  OrdersComponent --> OrderService
+  FavoritesComponent --> FavoriteService
+  AdminDashboardComponent --> AdminService
+  SellerDashboardComponent --> StoreService

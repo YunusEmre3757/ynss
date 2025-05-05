@@ -1,0 +1,45 @@
+graph TD
+  %% Root
+  AppModule(("AppModule<br/>app.module.ts"))
+  
+  %% Lazy-loaded Feature Modules
+  subgraph Features
+    HomeModule["HomeModule<br/>/home"]
+    ProductModule["ProductModule<br/>/products"]
+    StoreModule["StoreModule<br/>/stores"]
+    CartModule["CartModule<br/>/cart"]
+    CheckoutModule["CheckoutModule<br/>/checkout"]
+    FavoritesModule["FavoritesModule<br/>/favorites"]
+    OrdersModule["OrdersModule<br/>/orders"]
+    OrderSuccessModule["OrderSuccessModule<br/>/order-success"]
+    ProfileModule["Profile(Xd)Module<br/>/profile"]
+    AuthModule["AuthModule<br/>/auth"]
+    SellerModule["SellerModule<br/>/seller"]
+    AdminModule["AdminModule<br/>/admin"]
+  end
+  
+  %% Guards
+  subgraph Guards
+    authGuard
+    adminGuard
+    sellerGuard
+  end
+  
+  %% Infrastructure
+  AuthInterceptor
+  NgxStripeModule
+  HttpClientModule
+  
+  %% Edges
+  AppModule --> Features
+  AppModule --> AuthInterceptor
+  AppModule --> NgxStripeModule
+  AppModule --> HttpClientModule
+  
+  %% Guard connections
+  Guards --> RouterOutlet((Router))
+  RouterOutlet --> Features
+  
+  %% Role-specific
+  SellerModule -. lazy .-> SellerDashboard
+  AdminModule  -. lazy .-> AdminDashboard
